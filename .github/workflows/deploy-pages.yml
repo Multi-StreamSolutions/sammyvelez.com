@@ -35,10 +35,11 @@ jobs:
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Convert reels for browser playback
+      - name: Convert all reels for browser playback
         run: |
-          ffmpeg -y -i "A-Sammy-Voiceover-Reel-ScreenRecording_05-18-2026 06-14-18_1.MOV" -c:v libx264 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 128k "dist/voiceover-reel-01.mp4"
-          ffmpeg -y -i "A-Sammy-Voiceover-2-33b4da129.MOV" -c:v libx264 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 128k "dist/voiceover-reel-02.mp4"
+          ffmpeg -y -i "A-Sammy-Voiceover-Reel-ScreenRecording_05-18-2026 06-14-18_1.MOV" -c:v libx264 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 192k "dist/voiceover-reel-01.mp4"
+          ffmpeg -y -i "A-Sammy-Voiceover-2-33b4da129.MOV" -c:v libx264 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 192k "dist/voiceover-reel-02.mp4"
+          ffmpeg -y -i "Sammy Velez Acting Reel.MOV" -c:v libx264 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 192k "dist/acting-reel.mp4"
 
       - name: Apply site refinements
         run: |
@@ -55,19 +56,22 @@ jobs:
           s = s.replace('https://app.mi-card.io/sammyvelez', 'https://app.micard.io//sammyvelez/')
           s = re.sub(r'/assets/A-Sammy-Voiceover-Reel-ScreenRecording_05-18-2026%2006-14-18_1-[^\"]+\.MOV', '/voiceover-reel-01.mp4', s)
           s = re.sub(r'/assets/A-Sammy-Voiceover-2-33b4da129-[^\"]+\.MOV', '/voiceover-reel-02.mp4', s)
-          s = s.replace('type="video/quicktime"', 'type="video/mp4"', 2)
+          s = re.sub(r'/assets/Sammy%20Velez%20Acting%20Reel-[^\"]+\.MOV', '/acting-reel.mp4', s)
+          s = re.sub(r'type="video/quicktime"', 'type="video/mp4"', s)
           p.write_text(s)
           PY
 
       - name: Verify deployment
         run: |
           test -f dist/index.html
-          test -f dist/voiceover-reel-01.mp4
-          test -f dist/voiceover-reel-02.mp4
+          test -s dist/voiceover-reel-01.mp4
+          test -s dist/voiceover-reel-02.mp4
+          test -s dist/acting-reel.mp4
           ! grep -q '/sammyvelez.com/assets/' dist/index.html
           grep -q 'linear-gradient(135deg,#202020' dist/index.html
           grep -q '/voiceover-reel-01.mp4' dist/index.html
           grep -q '/voiceover-reel-02.mp4' dist/index.html
+          grep -q '/acting-reel.mp4' dist/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
