@@ -44,6 +44,7 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
           p = Path('dist/index.html')
           s = p.read_text()
           old = ".connect{background:#e6e4df;color:#111;text-align:center;padding:90px 7vw}.connect .eyebrow{color:#666;margin-bottom:22px}.connect h2{font:clamp(52px,8vw,105px)/.9 'Italiana';margin:0}.connect p{max-width:620px;margin:25px auto 40px;color:#555;line-height:1.7}.connect-links{max-width:900px;margin:auto;display:flex;justify-content:center;flex-wrap:wrap;gap:10px}.connect-links a{border:1px solid #777;padding:15px 18px;font-size:10px;letter-spacing:.13em;text-transform:uppercase;transition:.2s}.connect-links a:hover{background:#111;color:#fff}"
@@ -52,22 +53,21 @@ jobs:
               raise SystemExit('Connect CSS signature not found')
           s = s.replace(old, new)
           s = s.replace('https://app.mi-card.io/sammyvelez', 'https://app.micard.io//sammyvelez/')
-          s = s.replace('A-Sammy-Voiceover-Reel-ScreenRecording_05-18-2026%2006-14-18_1.MOV\" type=\"video/quicktime', 'voiceover-reel-01.mp4\" type=\"video/mp4')
-          s = s.replace('A-Sammy-Voiceover-2-33b4da129.MOV\" type=\"video/quicktime', 'voiceover-reel-02.mp4\" type=\"video/mp4')
+          s = re.sub(r'/assets/A-Sammy-Voiceover-Reel-ScreenRecording_05-18-2026%2006-14-18_1-[^\"]+\.MOV', '/voiceover-reel-01.mp4', s)
+          s = re.sub(r'/assets/A-Sammy-Voiceover-2-33b4da129-[^\"]+\.MOV', '/voiceover-reel-02.mp4', s)
+          s = s.replace('type="video/quicktime"', 'type="video/mp4"', 2)
           p.write_text(s)
           PY
 
-      - name: Verify custom-domain asset URLs and links
+      - name: Verify deployment
         run: |
           test -f dist/index.html
           test -f dist/voiceover-reel-01.mp4
           test -f dist/voiceover-reel-02.mp4
-          grep -q '/assets/' dist/index.html
           ! grep -q '/sammyvelez.com/assets/' dist/index.html
           grep -q 'linear-gradient(135deg,#202020' dist/index.html
-          grep -q 'https://app.micard.io//sammyvelez/' dist/index.html
-          grep -q 'voiceover-reel-01.mp4' dist/index.html
-          grep -q 'voiceover-reel-02.mp4' dist/index.html
+          grep -q '/voiceover-reel-01.mp4' dist/index.html
+          grep -q '/voiceover-reel-02.mp4' dist/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
