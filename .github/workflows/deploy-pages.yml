@@ -27,17 +27,16 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        # This repository does not yet have a lockfile; npm install creates one
-        # while honoring the bounded dependency ranges in package.json.
         run: npm install --no-audit --no-fund
 
-      - name: Build project site
+      - name: Build custom-domain site
         run: npm run build
 
-      - name: Verify project-path asset URLs
+      - name: Verify custom-domain asset URLs
         run: |
           test -f dist/index.html
-          grep -q '/sammyvelez.com/assets/' dist/index.html
+          grep -q '/assets/' dist/index.html
+          ! grep -q '/sammyvelez.com/assets/' dist/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
