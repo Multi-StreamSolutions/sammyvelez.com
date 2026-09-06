@@ -32,6 +32,14 @@ jobs:
       - name: Build custom-domain site
         run: npm run build
 
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Convert reels for browser playback
+        run: |
+          ffmpeg -y -i "A-Sammy-Voiceover-Reel-ScreenRecording_05-18-2026 06-14-18_1.MOV" -c:v libx264 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 128k "dist/voiceover-reel-01.mp4"
+          ffmpeg -y -i "A-Sammy-Voiceover-2-33b4da129.MOV" -c:v libx264 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 128k "dist/voiceover-reel-02.mp4"
+
       - name: Apply site refinements
         run: |
           python - <<'PY'
@@ -44,16 +52,22 @@ jobs:
               raise SystemExit('Connect CSS signature not found')
           s = s.replace(old, new)
           s = s.replace('https://app.mi-card.io/sammyvelez', 'https://app.micard.io//sammyvelez/')
+          s = s.replace('A-Sammy-Voiceover-Reel-ScreenRecording_05-18-2026%2006-14-18_1.MOV\" type=\"video/quicktime', 'voiceover-reel-01.mp4\" type=\"video/mp4')
+          s = s.replace('A-Sammy-Voiceover-2-33b4da129.MOV\" type=\"video/quicktime', 'voiceover-reel-02.mp4\" type=\"video/mp4')
           p.write_text(s)
           PY
 
       - name: Verify custom-domain asset URLs and links
         run: |
           test -f dist/index.html
+          test -f dist/voiceover-reel-01.mp4
+          test -f dist/voiceover-reel-02.mp4
           grep -q '/assets/' dist/index.html
           ! grep -q '/sammyvelez.com/assets/' dist/index.html
           grep -q 'linear-gradient(135deg,#202020' dist/index.html
           grep -q 'https://app.micard.io//sammyvelez/' dist/index.html
+          grep -q 'voiceover-reel-01.mp4' dist/index.html
+          grep -q 'voiceover-reel-02.mp4' dist/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
