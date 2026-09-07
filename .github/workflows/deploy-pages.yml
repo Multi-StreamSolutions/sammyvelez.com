@@ -53,6 +53,8 @@ jobs:
           if old not in s:
               raise SystemExit('Connect CSS signature not found')
           s = s.replace(old, new)
+          modeling = ".cream{background:linear-gradient(135deg,#292929 0%,#1c1c1c 55%,#252525 100%);color:#f4f1ea;border-top:1px solid #ffffff1f;border-bottom:1px solid #ffffff1f}.cream .eyebrow{color:#aaa}.cream h2{color:#f4f1ea}.cream h2 em{color:#aaa}.cream .model-copy p{color:#c2c2c2}.cream .button{border-color:#777;color:#f4f1ea}.cream .button:hover{background:#f1f1ee;color:#111;border-color:#f1f1ee}"
+          s = s.replace('</style>', modeling + '</style>')
           s = s.replace('https://app.mi-card.io/sammyvelez', 'https://app.micard.io//sammyvelez/')
           s = re.sub(r'/assets/A-Sammy-Voiceover-Reel-ScreenRecording_05-18-2026%2006-14-18_1-[^\"]+\.MOV', '/voiceover-reel-01.mp4', s)
           s = re.sub(r'/assets/A-Sammy-Voiceover-2-33b4da129-[^\"]+\.MOV', '/voiceover-reel-02.mp4', s)
@@ -71,6 +73,7 @@ jobs:
           test -s dist/acting-reel.mp4
           ! grep -q '/sammyvelez.com/assets/' dist/index.html
           grep -q 'linear-gradient(135deg,#202020' dist/index.html
+          grep -q 'linear-gradient(135deg,#292929' dist/index.html
           grep -q '/voiceover-reel-01.mp4' dist/index.html
           grep -q '/voiceover-reel-02.mp4' dist/index.html
           grep -q '/acting-reel.mp4' dist/index.html
